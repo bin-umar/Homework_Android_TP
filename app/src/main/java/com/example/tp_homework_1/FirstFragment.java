@@ -1,10 +1,8 @@
 package com.example.tp_homework_1;
 
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.ViewModelProviders;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -13,7 +11,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,13 +19,9 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-import java.util.Random;
-import java.util.logging.Logger;
 
 public class FirstFragment extends Fragment {
 
-    private FirstViewModel mViewModel;
     private List<Integer> data;
     private GridLayoutManager layoutManager;
     private NumberListAdapter adapter;
@@ -48,7 +41,8 @@ public class FirstFragment extends Fragment {
             data.add(counter);
         }
 
-        layoutManager = new GridLayoutManager(getActivity(), 3);
+        int spanCount = getResources().getInteger(R.integer.column_count);
+        layoutManager = new GridLayoutManager(getActivity(), spanCount);
         adapter = new NumberListAdapter(data);
 
         RecyclerView listView = view.findViewById(R.id.list);
@@ -65,14 +59,6 @@ public class FirstFragment extends Fragment {
 
         return view;
     }
-
-//    @Override
-//    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-//        super.onActivityCreated(savedInstanceState);
-//        mViewModel = ViewModelProviders.of(this).get(FirstViewModel.class);
-//        // TODO: Use the ViewModel
-//
-//    }
 }
 
 class NumberViewHolder extends RecyclerView.ViewHolder {

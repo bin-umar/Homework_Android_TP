@@ -8,6 +8,9 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -23,13 +26,8 @@ import java.util.List;
 public class FirstFragment extends Fragment {
 
     private List<Integer> data;
-    private GridLayoutManager layoutManager;
     private NumberListAdapter adapter;
     private int counter;
-
-    public static FirstFragment newInstance() {
-        return new FirstFragment();
-    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -42,8 +40,8 @@ public class FirstFragment extends Fragment {
         }
 
         int spanCount = getResources().getInteger(R.integer.column_count);
-        layoutManager = new GridLayoutManager(getActivity(), spanCount);
-        adapter = new NumberListAdapter(data);
+        GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), spanCount);
+        adapter = new NumberListAdapter(data, getActivity());
 
         RecyclerView listView = view.findViewById(R.id.list);
         listView.setAdapter(adapter);
@@ -62,14 +60,11 @@ public class FirstFragment extends Fragment {
 }
 
 class NumberViewHolder extends RecyclerView.ViewHolder {
-    private final TextView textView;
+    public TextView textView;
 
     NumberViewHolder(@NonNull View itemView) {
         super(itemView);
         textView = itemView.findViewById(R.id.list_item);
-//        textView.setOnClickListener(
-//                v -> mElementOnClickCallback.accept(Integer.parseInt(textView.getText().toString()))
-//        );
     }
 
     void SetValue(Integer value) {
@@ -85,9 +80,11 @@ class NumberListAdapter extends RecyclerView.Adapter<NumberViewHolder> {
     private List<Integer> data;
     private int oddColor;
     private int evenColor;
+    private FragmentActivity activity;
 
-    NumberListAdapter(List<Integer> _data) {
+    NumberListAdapter(List<Integer> _data, FragmentActivity _activity) {
         data = _data;
+        activity = _activity;
     }
 
     public void insertElem(int elem) {
@@ -111,7 +108,7 @@ class NumberListAdapter extends RecyclerView.Adapter<NumberViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull NumberViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final NumberViewHolder holder, int position) {
         Integer number = data.get(position);
         holder.SetValue(number);
 
@@ -120,6 +117,22 @@ class NumberListAdapter extends RecyclerView.Adapter<NumberViewHolder> {
         } else {
             holder.SetTextColor(oddColor);
         }
+
+        holder.textView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager fragmentManager = activity.getSupportFragmentManager();
+                FragmentTransaction transaction = fragmentManager.beginTransaction();
+
+                String value = holder.textView.getText().toString();
+                int color = holder.textView.getCurrentTextColor();
+
+                SecondFragment fragment = SecondFragment.newInstance(value, color);
+                transaction.replace(R.id.fragment_container, fragment);
+                transaction.addToBackStack("open_second_fragment");
+                transaction.commit();
+            }
+        });
     }
 
     @Override

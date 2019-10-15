@@ -21,22 +21,34 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Locale;
 
 public class FirstFragment extends Fragment {
 
-    private List<Integer> data;
-    private NumberListAdapter adapter;
+    private NumberListAdapter adapter = null;
     private int counter;
+    private static final String LIST_DATA_BUNDLE = "listDataBundle";
+    private static final String COUNTER_BUNDLE = "counterBundle";
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.first_fragment, container, false);
 
-        data = new ArrayList<>();
-        for (counter = 1; counter <= 100; counter++) {
-            data.add(counter);
+        ArrayList<Integer> data;
+
+        if (savedInstanceState == null) {
+            if (adapter == null) {
+                data = new ArrayList<>();
+                for (counter = 1; counter <= 100; counter++) {
+                    data.add(counter);
+                }
+            } else {
+                data = adapter.getData();
+            }
+        } else {
+            data = savedInstanceState.getIntegerArrayList(LIST_DATA_BUNDLE);
+            counter = savedInstanceState.getInt(COUNTER_BUNDLE);
         }
 
         int spanCount = getResources().getInteger(R.integer.column_count);
@@ -51,16 +63,23 @@ public class FirstFragment extends Fragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                adapter.insertElem(counter++);
+                adapter.add(counter++);
             }
         });
 
         return view;
     }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putIntegerArrayList(LIST_DATA_BUNDLE, adapter.getData());
+        outState.putInt(COUNTER_BUNDLE, counter);
+    }
 }
 
 class NumberViewHolder extends RecyclerView.ViewHolder {
-    public TextView textView;
+    TextView textView;
 
     NumberViewHolder(@NonNull View itemView) {
         super(itemView);
@@ -68,7 +87,7 @@ class NumberViewHolder extends RecyclerView.ViewHolder {
     }
 
     void SetValue(Integer value) {
-        textView.setText(Integer.toString(value));
+        textView.setText(String.format(Locale.getDefault(), "%d", value));
     }
 
     void SetTextColor(int color) {
@@ -77,19 +96,23 @@ class NumberViewHolder extends RecyclerView.ViewHolder {
 }
 
 class NumberListAdapter extends RecyclerView.Adapter<NumberViewHolder> {
-    private List<Integer> data;
+    private ArrayList<Integer> data;
     private int oddColor;
     private int evenColor;
     private FragmentActivity activity;
 
-    NumberListAdapter(List<Integer> _data, FragmentActivity _activity) {
+    NumberListAdapter(ArrayList<Integer> _data, FragmentActivity _activity) {
         data = _data;
         activity = _activity;
     }
 
-    public void insertElem(int elem) {
+    void add(int elem) {
         data.add(elem);
         notifyItemInserted(data.size() - 1);
+    }
+
+    ArrayList<Integer> getData() {
+        return data;
     }
 
     @NonNull

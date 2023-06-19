@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="minListElemHeight">48dp</dimen>
+    <dimen name="minListElemWidth">48dp</dimen>
+    <dimen name="listElemTextSize">24sp</dimen>
+    <dimen name="fragmentTextSize">256sp</dimen>
+</resources>
